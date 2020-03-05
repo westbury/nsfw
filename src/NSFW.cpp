@@ -11,8 +11,9 @@
 #pragma unmanaged
 Persistent<v8::Function> NSFW::constructor;
 
-NSFW::NSFW(uint32_t debounceMS, std::string path, Callback *eventCallback, Callback *errorCallback):
+NSFW::NSFW(uint32_t debounceMS, std::string path, bool followSymlinks, Callback *eventCallback, Callback *errorCallback):
   mDebounceMS(debounceMS),
+  mFollowSymlinks(followSymlinks),
   mErrorCallback(errorCallback),
   mEventCallback(eventCallback),
   mInterface(NULL),
@@ -133,9 +134,9 @@ NAN_MODULE_INIT(NSFW::Init) {
 
 NAN_METHOD(NSFW::JSNew) {
   if (!info.IsConstructCall()) {
-    const int argc = 4;
+    const int argc = 5;
     v8::Isolate *isolate = info.GetIsolate();
-    v8::Local<v8::Value> argv[argc] = {info[0], info[1], info[2], info[3]};
+    v8::Local<v8::Value> argv[argc] = {info[0], info[1], info[2], info[3], info[4]};
     v8::Local<v8::Context> context = isolate->GetCurrentContext();
     v8::Local<v8::Function> cons = v8::Local<v8::Function>::New(isolate, constructor);
     info.GetReturnValue().Set(cons->NewInstance(context, argc, argv).ToLocalChecked());
@@ -148,21 +149,25 @@ NAN_METHOD(NSFW::JSNew) {
   if (info.Length() < 2 || !info[1]->IsString()) {
     return ThrowError("Second argument of constructor must be a path.");
   }
-  if (info.Length() < 3 || !info[2]->IsFunction()) {
-    return ThrowError("Third argument of constructor must be a callback.");
+  if (info.Length() < 3 || !info[2]->IsBoolean()) {
+    return ThrowError("Third argument of constructor must be a boolean.");
   }
   if (info.Length() < 4 || !info[3]->IsFunction()) {
     return ThrowError("Fourth argument of constructor must be a callback.");
+  }
+  if (info.Length() < 5 || !info[4]->IsFunction()) {
+    return ThrowError("Fifth argument of constructor must be a callback.");
   }
 
   v8::Local<v8::Context> context = Nan::GetCurrentContext();
   uint32_t debounceMS = info[0]->Uint32Value(context).FromJust();
   Nan::Utf8String utf8Value(Nan::To<v8::String>(info[1]).ToLocalChecked());
   std::string path = std::string(*utf8Value);
-  Callback *eventCallback = new Callback(info[2].As<v8::Function>());
-  Callback *errorCallback = new Callback(info[3].As<v8::Function>());
+  bool followSymlinks = info[2]->BooleanValue();
+  Callback *eventCallback = new Callback(info[3].As<v8::Function>());
+  Callback *errorCallback = new Callback(info[4].As<v8::Function>());
 
-  NSFW *nsfw = new NSFW(debounceMS, path, eventCallback, errorCallback);
+  NSFW *nsfw = new NSFW(debounceMS, path, followSymlinks, eventCallback, errorCallback);
   nsfw->Wrap(info.This());
   info.GetReturnValue().Set(info.This());
 }
@@ -213,7 +218,7 @@ void NSFW::StartWorker::Execute() {
   }
 
   mNSFW->mQueue->clear();
-  mNSFW->mInterface = new NativeInterface(mNSFW->mPath, mNSFW->mQueue);
+  mNSFW->mInterface = new NativeInterface(mNSFW->mPath, mNSFW->mQueue, mNSFW->mFollowSymlinks);
   if (mNSFW->mInterface->isWatching()) {
     mNSFW->mRunning = true;
     uv_thread_create(&mNSFW->mPollThread, NSFW::pollForEvents, mNSFW);

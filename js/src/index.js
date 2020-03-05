@@ -39,7 +39,7 @@ nsfw.actions = {
 };
 
 _private.buildNSFW = function buildNSFW(watchPath, eventCallback, options) {
-  let { debounceMS, errorCallback } = options || {};
+  let { debounceMS, errorCallback, followSymlinks } = options || {};
 
   if (_isInteger(debounceMS)) {
     if (debounceMS < 1) {
@@ -61,10 +61,14 @@ _private.buildNSFW = function buildNSFW(watchPath, eventCallback, options) {
     throw new Error('Path to watch must be an absolute path.');
   }
 
+  if (followSymlinks === undefined) {
+    followSymlinks = true;
+  }
+
   return fse.stat(watchPath)
     .then(stats => {
       if (stats.isDirectory()) {
-        return new nsfw(debounceMS, watchPath, eventCallback, errorCallback);
+        return new nsfw(debounceMS, watchPath, followSymlinks, eventCallback, errorCallback);
       } else if (stats.isFile()) {
         return new _private.nsfwFilePoller(debounceMS, watchPath, eventCallback);
       } else {

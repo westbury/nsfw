@@ -2,8 +2,9 @@
 /**
  * InotifyTree ---------------------------------------------------------------------------------------------------------
  */
-InotifyTree::InotifyTree(int inotifyInstance, std::string path):
+InotifyTree::InotifyTree(int inotifyInstance, std::string path, bool followSymlinks):
   mError(""),
+  mFollowSymlinks(followSymlinks),
   mInotifyInstance(inotifyInstance) {
   mInotifyNodeByWatchDescriptor = new std::map<int, InotifyNode *>;
 
@@ -204,7 +205,7 @@ InotifyTree::InotifyNode::InotifyNode(
     struct stat file;
 
     if (
-      stat(filePath.c_str(), &file) < 0 ||
+      (mTree->mFollowSymlinks ? stat(filePath.c_str(), &file) : lstat(filePath.c_str(), &file)) < 0 ||
       !S_ISDIR(file.st_mode) ||
       !mTree->addInode(file.st_ino) // Skip this inode if already watching
     ) {

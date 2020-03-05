@@ -56,5 +56,12 @@ declare module 'nsfw' {
         debounceMS?: number;
         /**  callback to fire in the case of errors */
         errorCallback: (err: any) => void
+
+        /**
+         * If false, the contents of symlinked directories are not watched.
+         * Only applies on linux.
+         * Default: true.
+         */
+        followSymlinks: boolean;
     }
 }
