@@ -54,7 +54,7 @@ HANDLE Controller::openDirectory(const std::wstring &path) {
          );
 }
 
-Controller::Controller(std::shared_ptr<EventQueue> queue, const std::string &path)
+Controller::Controller(std::shared_ptr<EventQueue> queue, const std::string &path, bool followSymlinks)
   : mDirectoryHandle(INVALID_HANDLE_VALUE)
 {
   auto widePath = convertMultiByteToWideChar(path);

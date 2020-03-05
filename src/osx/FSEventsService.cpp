@@ -1,7 +1,7 @@
 #include "../../includes/osx/FSEventsService.h"
 #include <iostream>
 
-FSEventsService::FSEventsService(std::shared_ptr<EventQueue> queue, std::string path):
+FSEventsService::FSEventsService(std::shared_ptr<EventQueue> queue, std::string path, bool followSymlinks):
   mPath(path), mQueue(queue) {
   mRunLoop = new RunLoop(this, path);
 

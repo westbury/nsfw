@@ -9,7 +9,7 @@ class EventQueue;
 
 class Controller {
   public:
-    Controller(std::shared_ptr<EventQueue> queue, const std::string &path);
+    Controller(std::shared_ptr<EventQueue> queue, const std::string &path, bool followSymlinks);
 
     std::string getError();
     bool hasErrored();

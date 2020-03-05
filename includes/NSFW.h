@@ -20,10 +20,11 @@ public:
 
   Persistent<v8::Object> mPersistentHandle;
 private:
-  NSFW(uint32_t debounceMS, std::string path, Callback *eventCallback, Callback *errorCallback);
+  NSFW(uint32_t debounceMS, std::string path, bool followSymlinks, Callback *eventCallback, Callback *errorCallback);
   ~NSFW();
 
   uint32_t mDebounceMS;
+  bool mFollowSymlinks;
   uv_async_t mErrorCallbackAsync;
   uv_async_t mEventCallbackAsync;
   Callback *mErrorCallback;
