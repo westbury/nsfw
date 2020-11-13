@@ -12,7 +12,7 @@ class InotifyTree;
 
 class InotifyService {
 public:
-  InotifyService(std::shared_ptr<EventQueue> queue, std::string path);
+  InotifyService(std::shared_ptr<EventQueue> queue, std::string path, bool followSymlinks);
 
   std::string getError();
   bool hasErrored();
