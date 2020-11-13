@@ -2,7 +2,7 @@
 /**
  * InotifyTree ---------------------------------------------------------------------------------------------------------
  */
-InotifyTree::InotifyTree(int inotifyInstance, std::string path):
+InotifyTree::InotifyTree(int inotifyInstance, std::string path, bool followSymlinks):
   mError(""),
   mInotifyInstance(inotifyInstance) {
   mInotifyNodeByWatchDescriptor = new std::map<int, InotifyNode *>;
