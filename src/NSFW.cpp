@@ -105,7 +105,7 @@ void NSFW::StartWorker::Execute() {
   }
 
   mNSFW->mQueue->clear();
-  mNSFW->mInterface.reset(new NativeInterface(mNSFW->mPath, mNSFW->mQueue));
+  mNSFW->mInterface.reset(new NativeInterface(mNSFW->mPath, true, mNSFW->mQueue));
 
   if (mNSFW->mInterface->isWatching()) {
     mStatus = STARTED;
