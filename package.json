@@ -4,6 +4,10 @@
   "description": "A simple file watcher for Node",
   "main": "js/src/index.js",
   "scripts": {
+    "start": "node index.js",
+    "rebuild:dev": "node-gyp rebuild --debug",
+    "build:dev": "node-gyp build --debug",
+    "clean": "node-gyp clean",
     "lint": "eslint js/src js/spec",
     "test": "yarn lint && mocha --expose-gc js/spec"
   },
